@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Machine {
+  id         Int      @id @default(autoincrement())
+  name       String
+  status     Boolean  @default(false)
+  time       Int      @default(10)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  history    UsageHistory[]
+}
+
+model UsageHistory {
+  id         Int       @id @default(autoincrement())
+  machine    Machine   @relation(fields: [machineId], references: [id])
+  machineId  Int
+  start_time DateTime  @default(now())
+  end_time   DateTime?
+  status     String?   @default("completed")
+}
