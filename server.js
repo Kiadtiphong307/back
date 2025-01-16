@@ -3,10 +3,13 @@ const cors = require('cors');
 const prisma = require('./database/db');
 const app = express();
 
-app.use(cors({
-  origin: process.env.CORS_ORIGIN,
+const corsOptions = {
+  origin: 'https://beebox-washing.vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
-}));
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
@@ -118,6 +121,14 @@ app.get('/machines/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+prisma.$connect()
+  .then(() => {
+    console.log('Database connected successfully');
+  })
+  .catch((error) => {
+    console.error('Database connection error:', error);
+  });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
