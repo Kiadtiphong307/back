@@ -3,11 +3,11 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = "mysql://kiadtiphong192:boss12345@localhost:3306/beebox_washing"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-model Machine {
+model Machines {
   id         Int      @id @default(autoincrement())
   name       String
   status     Boolean  @default(false)
@@ -19,7 +19,7 @@ model Machine {
 
 model UsageHistory {
   id         Int       @id @default(autoincrement())
-  machine    Machine   @relation(fields: [machineId], references: [id])
+  machine    Machines   @relation(fields: [machineId], references: [id])
   machineId  Int
   start_time DateTime  @default(now())
   end_time   DateTime?
