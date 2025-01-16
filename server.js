@@ -7,15 +7,16 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN,
   credentials: true
 }));
+
 app.use(express.json());
 
-// GET all machines
+// Routes
 app.get('/machines', async (req, res) => {
   try {
     const machines = await prisma.machine.findMany();
     res.json(machines);
   } catch (error) {
-    console.error('Error fetching machines:', error);
+    console.error('Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -118,7 +119,7 @@ app.get('/machines/:id', async (req, res) => {
   }
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
