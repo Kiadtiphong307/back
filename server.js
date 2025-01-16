@@ -105,6 +105,45 @@ app.post('/machines/:id/stop', async (req, res) => {
   }
 });
 
+// เพิ่ม route สำหรับอัพเดทสถานะเครื่อง
+app.put('/machines/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, time } = req.body;
+
+    const machine = await prisma.machines.update({
+      where: { id: parseInt(id) },
+      data: { 
+        status: status,
+        time: time || 10
+      }
+    });
+
+    res.json(machine);
+  } catch (error) {
+    console.error('Error updating machine:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// เพิ่ม route สำหรับอัพเดทเวลา
+app.put('/machines/:id/time', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { time } = req.body;
+
+    const machine = await prisma.machines.update({
+      where: { id: parseInt(id) },
+      data: { time: time }
+    });
+
+    res.json(machine);
+  } catch (error) {
+    console.error('Error updating time:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
