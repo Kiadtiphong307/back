@@ -44,6 +44,67 @@ app.get('/machines', async (req, res) => {
   }
 });
 
+// Start machine
+app.post('/machines/:id/start', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // อัพเดทสถานะเครื่อง
+    const machine = await prisma.machines.update({
+      where: { id: parseInt(id) },
+      data: { 
+        status: true,
+      }
+    });
+
+    // สร้างประวัติการใช้งาน
+    await prisma.usageHistory.create({
+      data: {
+        machineId: parseInt(id),
+        start_time: new Date(),
+        status: 'running'
+      }
+    });
+
+    res.json(machine);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Stop machine
+app.post('/machines/:id/stop', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // อัพเดทสถานะเครื่อง
+    const machine = await prisma.machines.update({
+      where: { id: parseInt(id) },
+      data: { 
+        status: false,
+      }
+    });
+
+    // อัพเดทประวัติการใช้งาน
+    await prisma.usageHistory.updateMany({
+      where: { 
+        machineId: parseInt(id),
+        end_time: null
+      },
+      data: {
+        end_time: new Date(),
+        status: 'completed'
+      }
+    });
+
+    res.json(machine);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
